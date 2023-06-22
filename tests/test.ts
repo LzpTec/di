@@ -1,12 +1,10 @@
 import test from 'ava';
-import { Container } from './src';
-import { Scopes } from './src/scopes';
+import { Container } from '../src';
+import { Scopes } from '../src/scopes';
 
-class Singleton{}
-class Instance{}
-class Context{
-    id: number = Math.random();
-}
+class Singleton { }
+class Instance { }
+class Context { }
 
 const container = new Container();
 container.register(Singleton, undefined, Scopes.SINGLETON);
