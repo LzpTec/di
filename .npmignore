@@ -1,0 +1,17 @@
+!dist/
+.travis.yml
+*.log
+.nvmrc
+npm-debug.log*
+tsconfig.json
+test
+stryker.conf.json
+examples/
+benchmark/
+docs/
+*.ts
+!*.d.ts
+pnpm-lock.yaml
+TODO.md
+.versionrc.json
+CHANGELOG.md
