@@ -23,6 +23,7 @@
   "scripts": {
     "build": "tsup",
     "prepublish": "pnpm run build",
+    "test": "ava test.ts",
     "release": "commit-and-tag-version",
     "release:minor": "commit-and-tag-version --release-as minor",
     "release:patch": "commit-and-tag-version --release-as patch",

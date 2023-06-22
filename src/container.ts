@@ -77,10 +77,13 @@ export class Container {
             case Scopes.CONTEXT:
                 const contextKey = new ContextToken<(() => T) | undefined>(() => undefined);
 
-                if (!this.#asyncContext.has(contextKey))
-                    this.#asyncContext.set(contextKey, createSingleton(() => typeof factory === 'function' ? factory(this) : new readKey()));
+                instance = () => {
+                    if (!this.#asyncContext.has(contextKey))
+                        this.#asyncContext.set(contextKey, createSingleton(() => typeof factory === 'function' ? factory(this) : new readKey()));
 
-                instance = this.#asyncContext.get(contextKey)!;
+                    const instanceMaker = this.#asyncContext.get(contextKey)!;
+                    return instanceMaker();
+                };
                 break;
             default:
                 instance = createSingleton(() => typeof factory === 'function' ? factory(this) : new readKey());
@@ -148,10 +151,13 @@ export class Container {
             case Scopes.CONTEXT:
                 const contextKey = new ContextToken<(() => T) | undefined>(() => undefined);
 
-                if (!this.#asyncContext.has(contextKey))
-                    this.#asyncContext.set(contextKey, createSingleton(() => factory(this)));
+                instance = () => {
+                    if (!this.#asyncContext.has(contextKey))
+                        this.#asyncContext.set(contextKey, createSingleton(() => factory(this)));
 
-                instance = this.#asyncContext.get(contextKey)!;
+                    const instanceMaker = this.#asyncContext.get(contextKey)!;
+                    return instanceMaker();
+                };
                 break;
             default:
                 instance = createSingleton(() => factory(this));

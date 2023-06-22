@@ -2,5 +2,5 @@
 
 ## 0.1.0
 
-- [ ] Implement context scope.
+- [x] Implement context scope.
 - [x] Container snapshot.
