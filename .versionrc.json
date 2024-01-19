@@ -41,5 +41,5 @@
             "hidden": true
         }
     ],
-    "commitUrlFormat": "https://github.com/LzpTec/concurrency/commit/{{hash}}"
+    "commitUrlFormat": "https://github.com/LzpTec/di/commit/{{hash}}"
 }
