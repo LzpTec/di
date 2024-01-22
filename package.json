@@ -54,6 +54,9 @@
     }
   },
   "dependencies": {
-    "@lzptec/ctx": "0.0.5"
+    "@lzptec/ctx": "^0.0.6"
+  },
+  "engines": {
+    "node": ">= 16.4.0"
   }
 }

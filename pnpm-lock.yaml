@@ -2,8 +2,8 @@ lockfileVersion: '6.0'
 
 dependencies:
   '@lzptec/ctx':
-    specifier: 0.0.5
-    version: 0.0.5
+    specifier: ^0.0.6
+    version: 0.0.6
 
 devDependencies:
   '@types/node':
@@ -294,8 +294,9 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
-  /@lzptec/ctx@0.0.5:
-    resolution: {integrity: sha512-QEY/2sWtzyqr947JHvKBy2JlvfnfMVIpVCvZEgiH6MjzJR+bkh52P4pLr4r95VpFbIk0vK1pvvJPEgOcLLPljA==}
+  /@lzptec/ctx@0.0.6:
+    resolution: {integrity: sha512-d6asx38SKJ+X2nR73iHbuGc82IwZyVEQS+XL4QAcTd4JRQ/+xpKtMkobkhBNBAM/c+rOIimyVleLnClF4qpYkg==}
+    engines: {node: '>= 16.4.0'}
     dev: false
 
   /@nodelib/fs.scandir@2.1.5:
