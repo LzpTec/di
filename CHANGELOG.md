@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.0.4](https://github.com/LzpTec/di/compare/v0.0.3...v0.0.4) (2024-04-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* Target ES2021.
+
+### Features
+
+* Target ES2021. ([868148f](https://github.com/LzpTec/di/commit/868148fcc13a13b069b1572efb23441853318e75))
+
+
+### Bug Fixes
+
+* Export container key. ([52211ce](https://github.com/LzpTec/di/commit/52211cef8c858d5591ba946f1821a7a4224d2a5a))
+* Export scopes. ([4990ada](https://github.com/LzpTec/di/commit/4990ada94acce23788d47ec85975d42204244c04))
+
 ## [0.0.3](https://github.com/LzpTec/di/compare/v0.0.2...v0.0.3) (2024-01-22)
 
 

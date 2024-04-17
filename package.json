@@ -1,6 +1,6 @@
 {
   "name": "@lzptec/di",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A Lightweight dependency manager",
   "author": "André Posso <admin@lzptec.com>",
   "license": "MIT",
