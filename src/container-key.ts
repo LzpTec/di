@@ -7,7 +7,7 @@ export class ContainerKey<T> {
 
     /**
      * 
-     * @param {string} description 
+     * @param {string} description
      */
     constructor(description: string) {
         this.#key = Symbol();

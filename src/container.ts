@@ -6,7 +6,7 @@ import type { ClassConstructor, Factory, KeyProvider } from './types';
 /**
  * 
  * @template {any} T
- * @param {() => T} fn 
+ * @param {() => T} fn
  * @returns {() => T} function
  */
 function createSingleton<T>(fn: () => T): () => T {
@@ -19,7 +19,7 @@ function createSingleton<T>(fn: () => T): () => T {
     };
 }
 
-const handlerList: Readonly<string[]> = [
+const handlerList: readonly string[] = [
     'apply',
     'construct',
     'defineProperty',
@@ -40,7 +40,7 @@ const handlerList: Readonly<string[]> = [
     'getOwnMetadata',
     'hasOwnMetadata',
     'metadata'
-];
+] as const;
 
 export class Container {
 
@@ -50,11 +50,14 @@ export class Container {
     /**
      * 
      * @template T
-     * @param {ContainerKey<T> | ClassConstructor<T> | string | symbol} key 
-     * @param {Factory<T>} [factory] 
+     * @param {ContainerKey<T> | ClassConstructor<T> | string | symbol} key
+     * @param {Factory<T>} [factory]
      * @param {Scopes} [scope=Scopes.SINGLETON]
      */
     register<T>(key: ContainerKey<T> | ClassConstructor<T> | string | symbol, factory?: Factory<T>, scope: Scopes = Scopes.SINGLETON): void {
+        if ((key instanceof ContainerKey || typeof key === 'string' || typeof key === 'symbol') && typeof factory !== 'function')
+            throw new Error(`ContainerKey, string and symbol requires a factory.`);
+
         const readKey = key instanceof ContainerKey ? key.key : key;
         const keyDescription = key instanceof ContainerKey ? key.description : key.toString();
 
@@ -96,7 +99,7 @@ export class Container {
     /**
      * 
      * @template {any} T
-     * @param {ClassConstructor<T> | ContainerKey<T> | string | symbol} key 
+     * @param {ClassConstructor<T> | ContainerKey<T> | string | symbol} key
      * @returns {T} The value stored on the `key`
      */
     get<T>(key: ClassConstructor<T> | ContainerKey<T> | string | symbol): T {
@@ -106,7 +109,7 @@ export class Container {
     /**
      * 
      * @template {any} T
-     * @param {KeyProvider.<T>} key 
+     * @param {KeyProvider.<T>} key
      * @returns {T}
      */
     lazy<T>(key: KeyProvider<T>): T {
@@ -124,12 +127,12 @@ export class Container {
     }
 
     /**
-     * Runs a function within a context and returns its return value. 
+     * Runs a function within a context and returns its return value.
      * The store is not accessible outside of the callback function or
      * the asynchronous operations created within the callback.
      * 
-     * @param callback 
-     * @returns 
+     * @param callback
+     * @returns
      */
     context<T>(callback: () => T | Promise<T>) {
         return this.#asyncContext.run(callback);
