@@ -43,9 +43,10 @@ const handlerList: readonly string[] = [
 ] as const;
 
 export class Container {
-
     #instances = new Map<any, () => any>();
     #asyncContext = new AsyncContext();
+
+    static readonly #globalInstances = new WeakMap<any, () => any>();
 
     /**
      * 
@@ -89,29 +90,7 @@ export class Container {
             return this.#registerConstant(readKey, factory, scope);
         }
 
-        let instance: () => any;
-
-        switch (scope) {
-            case Scopes.INSTANCE:
-                instance = () => typeof factory === 'function' ? factory(this) : new readKey();
-                break;
-            case Scopes.CONTEXT:
-                const contextKey = new ContextToken<(() => T) | undefined>(() => undefined);
-
-                instance = () => {
-                    if (!this.#asyncContext.has(contextKey))
-                        this.#asyncContext.set(contextKey, createSingleton(() => typeof factory === 'function' ? factory(this) : new readKey()));
-
-                    const instanceMaker = this.#asyncContext.get(contextKey)!;
-                    return instanceMaker();
-                };
-                break;
-            default:
-                instance = createSingleton(() => typeof factory === 'function' ? factory(this) : new readKey());
-                break;
-        }
-
-        this.#instances.set(key, instance);
+        return this.#registerInstance(readKey, factory, scope)
     }
 
     /**
@@ -156,13 +135,37 @@ export class Container {
         return this.#asyncContext.run(callback);
     }
 
-    #registerConstant<T>(key: ContainerKey<T> | string | symbol, factory: Factory<T>, scope: Scopes) {
-        const readKey = key instanceof ContainerKey ? key.key : key;
-        const keyDescription = key instanceof ContainerKey ? key.description : key.toString();
+    #registerInstance<T>(readKey: new (...args: any[]) => T, factory?: Factory<T>, scope?: Scopes) {
+        let instance: () => any;
 
-        if (this.#instances.has(readKey))
-            throw new Error(`${keyDescription} is already in use`);
+        switch (scope) {
+            case Scopes.INSTANCE:
+                instance = () => typeof factory === 'function' ? factory(this) : new readKey();
+                break;
+            case Scopes.CONTEXT:
+                const contextKey = new ContextToken<(() => T) | undefined>(() => undefined);
 
+                instance = () => {
+                    if (!this.#asyncContext.has(contextKey))
+                        this.#asyncContext.set(contextKey, createSingleton(() => typeof factory === 'function' ? factory(this) : new readKey()));
+
+                    const instanceMaker = this.#asyncContext.get(contextKey)!;
+                    return instanceMaker();
+                };
+                break;
+            case Scopes.SINGLETON:
+                instance = createSingleton(() => typeof factory === 'function' ? factory(this) : new readKey());
+                Container.#globalInstances.set(readKey, instance);
+                return;
+            default:
+                instance = createSingleton(() => typeof factory === 'function' ? factory(this) : new readKey());
+                break;
+        }
+
+        this.#instances.set(readKey, instance);
+    }
+
+    #registerConstant<T>(readKey: string | symbol, factory: Factory<T>, scope: Scopes) {
         let instance: () => any;
 
         switch (scope) {
@@ -180,6 +183,10 @@ export class Container {
                     return instanceMaker();
                 };
                 break;
+            case Scopes.SINGLETON:
+                instance = createSingleton(() => factory(this));
+                Container.#globalInstances.set(readKey, instance);
+                return;
             default:
                 instance = createSingleton(() => factory(this));
                 break;
@@ -192,7 +199,7 @@ export class Container {
         const getInstance = () => {
             const keyValue = key();
 
-            const factory = this.#instances.get(keyValue);
+            const factory = Container.#globalInstances.get(keyValue) ?? this.#instances.get(keyValue);
             if (!factory) {
                 const readKey = keyValue instanceof ContainerKey ? keyValue.key : keyValue;
                 const keyDescription = keyValue instanceof ContainerKey ? keyValue.description : keyValue.toString();
