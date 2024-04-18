@@ -43,10 +43,15 @@ const handlerList: readonly string[] = [
 ] as const;
 
 export class Container {
-    #instances = new Map<any, () => any>();
+    #instances = new WeakMap<any, () => any>();
     #asyncContext = new AsyncContext();
+    #parent?: Container;
 
     static readonly #globalInstances = new WeakMap<any, () => any>();
+
+    constructor(parent?: Container) {
+        this.#parent = parent;
+    }
 
     /**
      * 
@@ -189,7 +194,14 @@ export class Container {
         const getInstance = () => {
             const keyValue = key();
 
-            const factory = Container.#globalInstances.get(keyValue) ?? this.#instances.get(keyValue);
+            let factory: (() => any) | undefined = Container.#globalInstances.get(keyValue);
+            let container: Container | undefined = this;
+
+            while (!factory && container) {
+                factory = container.#instances.get(keyValue);
+                container = container.#parent;
+            }
+
             if (!factory) {
                 const readKey = keyValue instanceof ContainerKey ? keyValue.key : keyValue;
                 const keyDescription = keyValue instanceof ContainerKey ? keyValue.description : keyValue.toString();
