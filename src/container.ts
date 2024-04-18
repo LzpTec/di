@@ -114,16 +114,6 @@ export class Container {
     }
 
     /**
-     * 
-     * @returns {Container} Snapshot of this container
-     */
-    snapshot(): Container {
-        const container = new Container();
-        container.#instances = new Map(this.#instances);
-        return container;
-    }
-
-    /**
      * Runs a function within a context and returns its return value.
      * The store is not accessible outside of the callback function or
      * the asynchronous operations created within the callback.
