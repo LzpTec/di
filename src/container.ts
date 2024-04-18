@@ -51,6 +51,24 @@ export class Container {
      * 
      * @template T
      * @param {ContainerKey<T> | ClassConstructor<T> | string | symbol} key
+     * @param {Factory<T>} factory
+     * @param {Scopes} [scope=Scopes.SINGLETON]
+     */
+    register<T>(key: ContainerKey<T> | string | symbol, factory: Factory<T>, scope?: Scopes): void;
+
+    /**
+     * 
+     * @template T
+     * @param {ContainerKey<T> | ClassConstructor<T> | string | symbol} key
+     * @param {Factory<T>} [factory]
+     * @param {Scopes} [scope=Scopes.SINGLETON]
+     */
+    register<T>(key: ClassConstructor<T>, factory?: Factory<T>, scope?: Scopes): void;
+
+    /**
+     * 
+     * @template T
+     * @param {ContainerKey<T> | ClassConstructor<T> | string | symbol} key
      * @param {Factory<T>} [factory]
      * @param {Scopes} [scope=Scopes.SINGLETON]
      */
