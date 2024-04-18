@@ -5,7 +5,7 @@ export enum Scopes {
     SINGLETON = 0,
 
     /**
-     * Creates a single instance per container.
+     * Creates a single instance per container context.
      */
     CONTEXT = 1,
 
