@@ -83,10 +83,11 @@ export class Container {
             throw new Error(`ContainerKey, string and symbol requires a factory.`);
 
         const readKey = key instanceof ContainerKey ? key.key : key;
-        const keyDescription = key instanceof ContainerKey ? key.description : key.toString();
 
-        if (this.#instances.has(readKey))
+        if (this.#instances.has(readKey)) {
+            const keyDescription = this.#getKeyDescription(key);
             throw new Error(`${keyDescription} is already in use`);
+        }
 
         if (typeof readKey === 'string' || typeof readKey === 'symbol') {
             if (typeof factory !== 'function')
@@ -193,18 +194,18 @@ export class Container {
     #makeInstance<T>(key: KeyProvider<T>, lazy: boolean) {
         const getInstance = () => {
             const keyValue = key();
+            const readKey = keyValue instanceof ContainerKey ? keyValue.key : keyValue;
 
-            let factory: (() => any) | undefined = Container.#globalInstances.get(keyValue);
+            let factory: (() => any) | undefined = Container.#globalInstances.get(readKey);
             let container: Container | undefined = this;
 
             while (!factory && container) {
-                factory = container.#instances.get(keyValue);
+                factory = container.#instances.get(readKey);
                 container = container.#parent;
             }
 
             if (!factory) {
-                const readKey = keyValue instanceof ContainerKey ? keyValue.key : keyValue;
-                const keyDescription = keyValue instanceof ContainerKey ? keyValue.description : keyValue.toString();
+                const keyDescription = this.#getKeyDescription(keyValue);
 
                 console.error('Key not found');
                 console.error(readKey);
@@ -216,7 +217,7 @@ export class Container {
                 return obj;
             } catch (err) {
                 if (err instanceof RangeError)
-                    console.error(`Possible circular dependency`, keyValue);
+                    console.error(`Possible circular dependency`, readKey);
 
                 console.error(err);
                 throw err;
@@ -250,6 +251,16 @@ export class Container {
 
         const instance: any = new Proxy({}, handler);
         return instance;
+    }
+
+    #getKeyDescription<T>(key: ClassConstructor<T> | ContainerKey<T> | string | symbol) {
+        if (key instanceof ContainerKey)
+            return key.description;
+
+        if ('name' in (key as any))
+            return (key as any).name;
+
+        return key.toString();
     }
 
 }
