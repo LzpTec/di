@@ -84,7 +84,7 @@ export class Container {
 
         const readKey = key instanceof ContainerKey ? key.key : key;
 
-        if (this.#instances.has(readKey)) {
+        if (Container.#globalInstances.has(readKey) || this.#instances.has(readKey)) {
             const keyDescription = this.#getKeyDescription(key);
             throw new Error(`${keyDescription} is already in use`);
         }
