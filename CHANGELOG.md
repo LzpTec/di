@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.0.5](https://github.com/LzpTec/di/compare/v0.0.4...v0.0.5) (2024-04-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* Removed snapshot method in favor of childs.
+* Implement new Singleton and Container scopes.
+
+### Features
+
+* Implement new Singleton and Container scopes. ([52f45dd](https://github.com/LzpTec/di/commit/52f45dd6dd6a1f2197eccb3a74ee223017c5c240))
+* Implemented container relations. ([c26fac9](https://github.com/LzpTec/di/commit/c26fac9b6a51d6324fae37fb1c28252f5c4a815a))
+* new Container Scope. ([40acfbf](https://github.com/LzpTec/di/commit/40acfbfb7545c6867218f4336695974a1c50adcc))
+* Removed snapshot method in favor of childs. ([e887d20](https://github.com/LzpTec/di/commit/e887d20704d6ff49c60ee595254292e7593e7adc))
+
+
+### Bug Fixes
+
+* Incorrect implementation of ContainerKeys<T>. ([4229d48](https://github.com/LzpTec/di/commit/4229d4874861f3137eb192f5144d79df620e1510))
+
+
+### Docs
+
+* Fix context scope description. ([b8987ea](https://github.com/LzpTec/di/commit/b8987ea80a49edc84875bcfd58c17ab0e6086f1e))
+
+
+### Misc
+
+* Improve container types. ([b57fc9a](https://github.com/LzpTec/di/commit/b57fc9aa8e6083da01ec95f1a98e046dcfe921d0))
+
+
+### Dependencies
+
+* Update deps. ([885da11](https://github.com/LzpTec/di/commit/885da11ab8d89c3b55a88519304c14b736f67e9e))
+
 ## [0.0.4](https://github.com/LzpTec/di/compare/v0.0.3...v0.0.4) (2024-04-17)
 
 
