@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.0](https://github.com/LzpTec/di/compare/v0.0.5...v0.1.0) (2024-04-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* Removed string and symbol support. Use ContainerKey instead.
+
+### Features
+
+* Removed string and symbol support. Use ContainerKey instead. ([96ebcee](https://github.com/LzpTec/di/commit/96ebcee440a65f780680277607a21beeb09270fb))
+
+
+### Bug Fixes
+
+* Search used key in global instances. ([97adffb](https://github.com/LzpTec/di/commit/97adffbbf9f164afd4ce0d21686e611d989bfae1))
+* Use Map instead of WeakMap for symbols and strings. ([0bd22e6](https://github.com/LzpTec/di/commit/0bd22e6c6f410ede25e8bbb01dce900bf0c5d1d9))
+
 ## [0.0.5](https://github.com/LzpTec/di/compare/v0.0.4...v0.0.5) (2024-04-25)
 
 
