@@ -43,11 +43,11 @@ const handlerList: readonly string[] = [
 ] as const;
 
 export class Container {
-    #instances = new Map<any, () => any>();
+    #instances = new WeakMap<any, () => any>();
     #asyncContext = new AsyncContext();
     #parent?: Container;
 
-    static readonly #globalInstances = new Map<any, () => any>();
+    static readonly #globalInstances = new WeakMap<any, () => any>();
 
     constructor(parent?: Container) {
         this.#parent = parent;
@@ -56,16 +56,16 @@ export class Container {
     /**
      * 
      * @template T
-     * @param {ContainerKey<T> | ClassConstructor<T> | string | symbol} key
+     * @param {ContainerKey<T>} key
      * @param {Factory<T>} factory
      * @param {Scopes} [scope=Scopes.SINGLETON]
      */
-    register<T>(key: ContainerKey<T> | string | symbol, factory: Factory<T>, scope?: Scopes): void;
+    register<T>(key: ContainerKey<T>, factory: Factory<T>, scope?: Scopes): void;
 
     /**
      * 
      * @template T
-     * @param {ContainerKey<T> | ClassConstructor<T> | string | symbol} key
+     * @param {ClassConstructor<T>} key
      * @param {Factory<T>} [factory]
      * @param {Scopes} [scope=Scopes.SINGLETON]
      */
@@ -74,38 +74,36 @@ export class Container {
     /**
      * 
      * @template T
-     * @param {ContainerKey<T> | ClassConstructor<T> | string | symbol} key
+     * @param {ContainerKey<T> | ClassConstructor<T>} key
      * @param {Factory<T>} [factory]
      * @param {Scopes} [scope=Scopes.SINGLETON]
      */
-    register<T>(key: ContainerKey<T> | ClassConstructor<T> | string | symbol, factory?: Factory<T>, scope: Scopes = Scopes.SINGLETON): void {
-        if ((key instanceof ContainerKey || typeof key === 'string' || typeof key === 'symbol') && typeof factory !== 'function')
-            throw new Error(`ContainerKey, string and symbol requires a factory.`);
+    register<T>(key: ContainerKey<T> | ClassConstructor<T>, factory?: Factory<T>, scope: Scopes = Scopes.SINGLETON): void {
+        if ((key instanceof ContainerKey) && typeof factory !== 'function')
+            throw new Error(`ContainerKey requires a factory.`);
 
-        const readKey = key instanceof ContainerKey ? key.key : key;
-
-        if (Container.#globalInstances.has(readKey) || this.#instances.has(readKey)) {
+        if (Container.#globalInstances.has(key) || this.#instances.has(key)) {
             const keyDescription = this.#getKeyDescription(key);
             throw new Error(`${keyDescription} is already in use`);
         }
 
-        if (typeof readKey === 'string' || typeof readKey === 'symbol') {
+        if (key instanceof ContainerKey) {
             if (typeof factory !== 'function')
                 throw new Error('Factory is required!');
 
-            return this.#registerConstant(readKey, factory, scope);
+            return this.#registerConstant(key, factory, scope);
         }
 
-        return this.#registerInstance(readKey, factory, scope)
+        return this.#registerInstance(key, factory, scope)
     }
 
     /**
      * 
      * @template {any} T
-     * @param {ClassConstructor<T> | ContainerKey<T> | string | symbol} key
+     * @param {ClassConstructor<T> | ContainerKey<T>} key
      * @returns {T} The value stored on the `key`
      */
-    get<T>(key: ClassConstructor<T> | ContainerKey<T> | string | symbol): T {
+    get<T>(key: ClassConstructor<T> | ContainerKey<T>): T {
         return this.#makeInstance(() => key, false);
     }
 
@@ -161,7 +159,7 @@ export class Container {
         this.#instances.set(readKey, instance);
     }
 
-    #registerConstant<T>(readKey: string | symbol, factory: Factory<T>, scope: Scopes) {
+    #registerConstant<T>(readKey: ContainerKey<T>, factory: Factory<T>, scope: Scopes) {
         let instance: () => any;
 
         switch (scope) {
@@ -194,13 +192,12 @@ export class Container {
     #makeInstance<T>(key: KeyProvider<T>, lazy: boolean) {
         const getInstance = () => {
             const keyValue = key();
-            const readKey = keyValue instanceof ContainerKey ? keyValue.key : keyValue;
 
-            let factory: (() => any) | undefined = Container.#globalInstances.get(readKey);
+            let factory: (() => any) | undefined = Container.#globalInstances.get(keyValue);
             let container: Container | undefined = this;
 
             while (!factory && container) {
-                factory = container.#instances.get(readKey);
+                factory = container.#instances.get(keyValue);
                 container = container.#parent;
             }
 
@@ -208,7 +205,7 @@ export class Container {
                 const keyDescription = this.#getKeyDescription(keyValue);
 
                 console.error('Key not found');
-                console.error(readKey);
+                console.error(keyValue);
                 throw new Error(`${keyDescription} is not found, did you call register?`);
             }
 
@@ -217,7 +214,7 @@ export class Container {
                 return obj;
             } catch (err) {
                 if (err instanceof RangeError)
-                    console.error(`Possible circular dependency`, readKey);
+                    console.error(`Possible circular dependency`, keyValue);
 
                 console.error(err);
                 throw err;
@@ -253,12 +250,12 @@ export class Container {
         return instance;
     }
 
-    #getKeyDescription<T>(key: ClassConstructor<T> | ContainerKey<T> | string | symbol) {
+    #getKeyDescription<T>(key: ClassConstructor<T> | ContainerKey<T>) {
         if (key instanceof ContainerKey)
             return key.description;
 
         if ('name' in (key as any))
-            return (key as any).name;
+            return key.name;
 
         return key.toString();
     }

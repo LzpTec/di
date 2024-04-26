@@ -15,6 +15,6 @@ export type Factory<T> = (container: Container) => T;
 
 /**
  * @template {object} T
- * @typedef {() => ClassConstructor<T> | ContainerKey<T> | string | symbol} KeyProvider
+ * @typedef {() => ClassConstructor<T> | ContainerKey<T>} KeyProvider
  */
-export type KeyProvider<T> = () => ClassConstructor<T> | ContainerKey<T> | string | symbol;
+export type KeyProvider<T> = () => ClassConstructor<T> | ContainerKey<T>;
