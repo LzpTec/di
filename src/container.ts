@@ -43,11 +43,11 @@ const handlerList: readonly string[] = [
 ] as const;
 
 export class Container {
-    #instances = new WeakMap<any, () => any>();
+    #instances = new Map<any, () => any>();
     #asyncContext = new AsyncContext();
     #parent?: Container;
 
-    static readonly #globalInstances = new WeakMap<any, () => any>();
+    static readonly #globalInstances = new Map<any, () => any>();
 
     constructor(parent?: Container) {
         this.#parent = parent;
