@@ -1,44 +1,71 @@
 import test from 'ava';
-import { Container } from '../src';
+import { Container, ContainerKey } from '../src';
 import { Scopes } from '../src/scopes';
 
-class Singleton { }
-class Instance { }
-class Context { }
+class SingletonTest { }
+class InstanceTest { }
+class ContextTest { }
+class ContainerTest { }
+
+const singletonKey = new ContainerKey<InstanceTest>('instance');
 
 const container = new Container();
-container.register(Singleton, undefined, Scopes.SINGLETON);
-container.register(Instance, undefined, Scopes.INSTANCE);
-container.register(Context, undefined, Scopes.CONTEXT);
+const container2 = new Container();
 
-test('Container Singleton', async (t) => {
-    const instance = container.get(Singleton);
+container.register(SingletonTest, undefined, Scopes.SINGLETON);
+container.register(InstanceTest, undefined, Scopes.INSTANCE);
+container.register(ContextTest, undefined, Scopes.CONTEXT);
+container.register(ContainerTest, undefined, Scopes.CONTAINER);
+container2.register(ContainerTest, undefined, Scopes.CONTAINER);
+container.register(singletonKey, () => new InstanceTest(), Scopes.SINGLETON);
 
-    t.is(instance, container.get(Singleton));
+test('Container - Container Scope', async (t) => {
+    const instance = container.get(ContainerTest);
+    const instance2 = container2.get(ContainerTest);
+
+    t.is(instance, container.get(ContainerTest));
+    t.is(instance2, container2.get(ContainerTest))
+    t.not(instance, instance2);
 
     t.pass();
 });
 
-test('Container Instance', async (t) => {
-    const instance = container.get(Instance);
+test('Container - Singleton Scope', async (t) => {
+    const instance = container.get(SingletonTest);
+    const instance2 = container2.get(SingletonTest);
 
-    t.not(instance, container.get(Instance));
+    t.is(instance, instance2);
+
     t.pass();
 });
 
-test('Container Context', async (t) => {
+test('Container - Instance Scope', async (t) => {
+    const instance = container.get(InstanceTest);
+
+    t.not(instance, container.get(InstanceTest));
+    t.pass();
+});
+
+test('Container - Context Scope', async (t) => {
     let instance1, instance2;
     await container.context(() => {
-        instance1 = container.get(Context);
+        instance1 = container.get(ContextTest);
     });
 
     await container.context(() => {
-        instance2 = container.get(Context);
-        let instance = container.get(Context);
+        instance2 = container.get(ContextTest);
+        let instance = container.get(ContextTest);
 
         t.is(instance, instance2);
     })
 
     t.not(instance1, instance2);
+    t.pass();
+});
+
+test('Container Key', async (t) => {
+    const instance = container.get(singletonKey);
+    t.is(instance, container.get(singletonKey));
+
     t.pass();
 });
